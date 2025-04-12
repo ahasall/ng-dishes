@@ -1,0 +1,57 @@
+@import 'tailwindcss' important;
+
+@plugin '@tailwindcss/forms';
+
+@layer components {
+  .wma-card {
+    @apply relative block overflow-hidden rounded-lg border border-gray-300 bg-white;
+  }
+
+  .wma-title {
+    @apply text-3xl font-bold text-gray-800;
+  }
+
+  .wma-container {
+    @apply block mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8;
+  }
+
+  .wma-mini-container {
+    @apply block mx-auto max-w-2xl px-4 py-8 sm:px-6 lg:px-8;
+  }
+
+  .wma-grid {
+    @apply grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4;
+  }
+
+  .wma-label {
+    @apply block text-sm font-medium text-gray-700;
+  }
+
+  .wma-heading-bar {
+    @apply flex flex-col gap-4 md:flex-row md:items-center md:justify-between;
+  }
+
+  .wma-button {
+    @apply rounded-md bg-green-600 px-3 py-2 text-sm text-white hover:bg-green-500 focus:ring-green-500 active:bg-green-700;
+  }
+
+  .wma-button[disabled] {
+    @apply cursor-not-allowed opacity-50;
+  }
+
+  .wma-input,
+  .wma-select {
+    @apply block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-green-600 focus:ring-inset sm:text-sm sm:leading-6;
+  }
+
+  .wma-input[disabled],
+  .wma-select[disabled] {
+    @apply bg-gray-50 text-gray-500;
+  }
+
+  .wma-input.ng-invalid.ng-touched,
+  .wma-select.ng-invalid.ng-touched {
+    @apply text-red-900 placeholder-red-300 ring-red-300 focus:ring-red-500;
+  }
+}
+

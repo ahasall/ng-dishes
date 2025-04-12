@@ -1,0 +1,134 @@
+{
+  "dishes": [
+    {
+      "id": "1",
+      "name": "Thieboudienne",
+      "continent": "Afrique",
+      "country": "Sénégal",
+      "price": 17,
+      "liked": true,
+      "image": "images/karelle-thieboudienne.png"
+    },
+    {
+      "id": "2",
+      "name": "Pizza Margherita",
+      "continent": "Europe",
+      "country": "Italie",
+      "price": 12,
+      "image": "images/unsplash-margherita.png",
+      "liked": false
+    },
+    {
+      "id": "3",
+      "name": "Burger",
+      "continent": "Amérique du Nord",
+      "country": "États-Unis",
+      "price": 10,
+      "image": "images/unsplash-burger.png",
+      "liked": false
+    },
+    {
+      "id": "4",
+      "name": "Magret de canard",
+      "continent": "Europe",
+      "country": "France",
+      "price": 25,
+      "image": "images/unsplash-magret.png",
+      "liked": false
+    },
+    {
+      "id": "5",
+      "name": "Butter chicken",
+      "continent": "Asie",
+      "country": "Inde",
+      "price": 15,
+      "image": "images/unsplash-butter-chicken.png",
+      "liked": false
+    },
+    {
+      "id": "6",
+      "name": "Tacos",
+      "continent": "Amérique du Nord",
+      "country": "Mexique",
+      "price": 8,
+      "image": "images/unsplash-tacos.png",
+      "liked": false
+    },
+    {
+      "id": "7",
+      "name": "Paella",
+      "continent": "Europe",
+      "country": "Espagne",
+      "price": 20,
+      "image": "images/unsplash-paella.png",
+      "liked": false
+    },
+    {
+      "id": "8",
+      "name": "Pad Thai",
+      "continent": "Asie",
+      "country": "Thaïlande",
+      "price": 13,
+      "image": "images/unsplash-pad-thai.png",
+      "liked": false
+    },
+    {
+      "id": "9",
+      "name": "Yassa",
+      "continent": "Afrique",
+      "country": "Sénégal",
+      "price": 16,
+      "image": "images/unsplash-yassa.png",
+      "liked": false
+    },
+    {
+      "id": "10",
+      "name": "Tajine",
+      "continent": "Afrique",
+      "country": "Maroc",
+      "price": 14,
+      "image": "images/unsplash-tajine.png",
+      "liked": false
+    },
+    {
+      "id": "11",
+      "name": "Asado",
+      "continent": "Amérique du Sud",
+      "country": "Argentine",
+      "price": 22,
+      "image": "images/unsplash-asado.png",
+      "liked": false
+    },
+    {
+      "id": "12",
+      "name": "Sushi",
+      "continent": "Asie",
+      "country": "Japon",
+      "price": 18,
+      "image": "images/unsplash-sushi.png",
+      "liked": false
+    }
+  ],
+  "discounts": [
+    {
+      "dishId": "1",
+      "minQuantity": 2,
+      "percentage": 10
+    },
+    {
+      "dishId": "9",
+      "minQuantity": 2,
+      "percentage": 10
+    },
+    {
+      "dishId": "4",
+      "minQuantity": 5,
+      "percentage": 5
+    },
+    {
+      "dishId": "7",
+      "minQuantity": 5,
+      "percentage": 5
+    }
+  ]
+}
