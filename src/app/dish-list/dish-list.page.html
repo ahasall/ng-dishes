@@ -1,0 +1,42 @@
+<main class="wma-container">
+  <div class="wma-heading-bar mb-8">
+    <div>
+      <h1 class="wma-title">{{ title }}</h1>
+      <p>{{ subtitle }}</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <input
+        [(ngModel)]="filter"
+        class="wma-input grow md:min-w-96"
+        type="search"
+        placeholder="Rechercher un plat"
+      />
+      <button class="wma-button" (click)="search()">Rechercher</button>
+    </div>
+  </div>
+
+  @switch (status) {
+    @case ('error') {
+      <app-error />
+    }
+
+    @case ('loading') {
+      <div class="text-center">
+        <app-spinner />
+      </div>
+    }
+
+    @case ('resolved') {
+      <div class="wma-grid">
+        @for (dish of dishes; track dish.id) {
+          <app-dish-card
+            (delete)="deleteDish($event)"
+            (like)="likeDish(dish.id)"
+            (unlike)="unlikeDish(dish.id)"
+            [dish]="dish"
+          />
+        }
+      </div>
+    }
+  }
+</main>
