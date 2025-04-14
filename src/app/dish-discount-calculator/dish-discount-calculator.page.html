@@ -1,0 +1,67 @@
+<main class="wma-card p-8">
+  <h2 class="wma-title">Calculateur de réduction</h2>
+
+  <div class="mt-8 space-y-4">
+    <div>
+      <label for="dish" class="wma-label">Plat</label>
+      <select
+        id="dish"
+        [(ngModel)]="dishId"
+        (ngModelChange)="onDishChange()"
+        class="wma-select mt-1"
+      >
+        <option value="">Sélectionnez un plat</option>
+        @for (dish of dishes; track dish.id) {
+          <option [value]="dish.id">{{ dish.name }} - {{ dish.price }}€</option>
+        }
+      </select>
+    </div>
+
+    @if (dish) {
+      <div>
+        <img [src]="dish.image" [alt]="dish.name" class="h-48 w-full rounded-lg object-cover" />
+      </div>
+
+      <div class="space-y-1">
+        <label class="wma-label">Prix unitaire</label>
+        <p class="mt-1 text-lg font-semibold text-gray-900">{{ dish.price }}€</p>
+      </div>
+
+      <div class="space-y-1">
+        <label class="wma-label">Quantité</label>
+        <div class="flex items-center space-x-3">
+          <button (click)="decrementQuantity()" class="wma-button" [disabled]="quantity <= 1">
+            -
+          </button>
+          <span class="w-12 text-center text-lg font-semibold">{{ quantity }}</span>
+          <button (click)="incrementQuantity()" class="wma-button">+</button>
+        </div>
+      </div>
+
+      @if (discount) {
+        <div class="rounded-lg bg-green-50 p-3">
+          <p class="text-sm font-medium text-green-700">
+            Réduction de {{ discount.percentage }}% appliquée !
+          </p>
+        </div>
+      }
+
+      <div class="mt-4 border-t pt-4">
+        <div class="mb-2 flex items-center justify-between">
+          <span class="text-gray-600">Sous-total :</span>
+          <span class="text-lg">{{ subtotal | currency: 'EUR' }}</span>
+        </div>
+        @if (discountAmount > 0) {
+          <div class="mb-2 flex items-center justify-between text-green-600">
+            <span>Réduction :</span>
+            <span> -{{ discountAmount | currency: 'EUR' }}</span>
+          </div>
+        }
+        <div class="flex items-center justify-between text-lg font-bold">
+          <span>Total :</span>
+          <span>{{ total | currency: 'EUR' }}</span>
+        </div>
+      </div>
+    }
+  </div>
+</main>
