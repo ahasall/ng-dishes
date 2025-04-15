@@ -25,22 +25,24 @@ export class DishListPage implements OnInit {
   dishService = inject(DishService);
 
   search() {
+    this.getDishes().subscribe((dishes) => {
+      this.dishes = dishes;
+    });
+  }
+
+  getDishes() {
     this.status = 'loading';
-    this.dishService
-      .getDishes(this.filter)
-      .pipe(
-        tap(() => {
-          this.status = 'resolved';
-        }),
-        catchError(() => {
-          this.status = 'error';
-          this.error = 'Une erreur est survenue.';
-          return of([] as Dish[]);
-        }),
-      )
-      .subscribe((dishes) => {
-        this.dishes = dishes;
-      });
+
+    return this.dishService.getDishes(this.filter).pipe(
+      tap(() => {
+        this.status = 'resolved';
+      }),
+      catchError(() => {
+        this.status = 'error';
+        this.error = 'Une erreur est survenue.';
+        return of([] as Dish[]);
+      }),
+    );
   }
 
   ngOnInit(): void {
