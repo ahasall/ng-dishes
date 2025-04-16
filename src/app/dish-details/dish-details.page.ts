@@ -1,12 +1,12 @@
 import { Component, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { DishService } from '../dish.service';
-import { AsyncPipe } from '@angular/common';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-dish-details',
   templateUrl: './dish-details.page.html',
-  imports: [AsyncPipe],
+  imports: [],
   host: {
     class: 'wma-mini-container',
   },
@@ -14,6 +14,6 @@ import { AsyncPipe } from '@angular/common';
 export class DishDetailsPage {
   dishId = inject(ActivatedRoute).snapshot.paramMap.get('dishId')!;
   service = inject(DishService);
-  dish$ = this.service.getDish(this.dishId);
-  discount$ = this.service.getDishDiscount(this.dishId);
+  $dish = toSignal(this.service.getDish(this.dishId));
+  $discount = toSignal(this.service.getDishDiscount(this.dishId));
 }
