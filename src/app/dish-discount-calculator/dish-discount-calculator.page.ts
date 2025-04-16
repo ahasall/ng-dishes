@@ -1,8 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, computed, inject, linkedSignal, signal } from '@angular/core';
 import { Dish } from '../dish';
-import { Discount } from '../discount';
 import { FormsModule } from '@angular/forms';
 import { CurrencyPipe } from '@angular/common';
+import { httpResource } from '@angular/common/http';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { DishService } from '../dish.service';
 
 @Component({
   selector: 'app-dish-discount-calculator',
@@ -13,51 +15,53 @@ import { CurrencyPipe } from '@angular/common';
   },
 })
 export class DishDiscountCalculatorPage {
-  dishes: Dish[] = [];
-  discounts: Discount[] = [];
-  quantity = 1;
-  dishId = '';
-  dish: Dish | null = null;
-  discount: Discount | null = null;
+  service = inject(DishService);
+  dishes = httpResource<Dish[]>('/api/dishes', {
+    defaultValue: [],
+  });
 
-  get subtotal(): number {
-    return this.dish ? this.dish.price * this.quantity : 0;
-  }
+  dishId = signal('');
+  $dish = computed(() => {
+    return this.dishes.value().find((d) => d.id === this.dishId()) || null;
+  });
+  quantity = linkedSignal({
+    source: () => this.dishId(),
+    computation: () => 1,
+  });
+  discountResource = rxResource({
+    request: () => ({
+      id: this.dishId(),
+    }),
+    loader: ({ request }) => {
+      return this.service.getDishDiscount(request.id);
+    },
+  });
+  $discount = computed(() => {
+    return this.discountResource.value() || null;
+  });
 
-  get discountAmount(): number {
-    if (!this.discount) return 0;
-    return (this.subtotal * this.discount.percentage) / 100;
-  }
+  subtotal = computed(() => {
+    const dish = this.$dish();
+    return dish ? dish.price * this.quantity() : 0;
+  });
 
-  get total(): number {
-    return this.subtotal - this.discountAmount;
-  }
+  discountAmount = computed(() => {
+    let discount = this.$discount();
+    if (!discount) return 0;
+    return (this.subtotal() * discount.percentage) / 100;
+  });
 
-  onDishChange() {
-    this.dish = this.dishes.find((d) => d.id === this.dishId) || null;
-    this.quantity = 1;
-    this.updateDiscount();
-  }
+  total = computed(() => {
+    return this.subtotal() - this.discountAmount();
+  });
 
   incrementQuantity() {
-    this.quantity++;
-    this.updateDiscount();
+    this.quantity.update((q) => q + 1);
   }
 
   decrementQuantity() {
-    if (this.quantity > 1) {
-      this.quantity--;
-      this.updateDiscount();
-    }
-  }
-
-  updateDiscount() {
-    if (!this.dish) {
-      this.discount = null;
-    } else {
-      this.discount =
-        this.discounts.find((d) => d.dishId === this.dish?.id && this.quantity >= d.minQuantity) ||
-        null;
+    if (this.quantity() > 1) {
+      this.quantity.update((q) => q - 1);
     }
   }
 }
