@@ -14,28 +14,22 @@
     </div>
   </div>
 
-  @switch (status()) {
-    @case ('error') {
-      <app-error />
-    }
-
-    @case ('loading') {
-      <div class="text-center">
-        <app-spinner />
-      </div>
-    }
-
-    @case ('resolved') {
-      <div class="wma-grid">
-        @for (dish of dishes(); track dish.id) {
-          <app-dish-card
-            (delete)="deleteDish($event)"
-            (like)="likeDish(dish.id)"
-            (unlike)="unlikeDish(dish.id)"
-            [dish]="dish"
-          />
-        }
-      </div>
-    }
+  @if (dishes.error()) {
+    <app-error />
+  } @else if (dishes.isLoading()) {
+    <div class="text-center">
+      <app-spinner />
+    </div>
+  } @else if (dishes.hasValue()) {
+    <div class="wma-grid">
+      @for (dish of dishes.value(); track dish.id) {
+        <app-dish-card
+          (delete)="deleteDish($event)"
+          (like)="likeDish(dish.id)"
+          (unlike)="unlikeDish(dish.id)"
+          [dish]="dish"
+        />
+      }
+    </div>
   }
 </main>
