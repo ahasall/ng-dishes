@@ -1,13 +1,13 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, ResourceRef, signal } from '@angular/core';
 import { DishCardComponent } from '../dish-card/dish-card.component';
-import { catchError, debounceTime, distinctUntilChanged, of, switchMap, tap } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { Dish } from '../dish';
 import { DishService } from '../dish.service';
 import { FormsModule } from '@angular/forms';
 import { SpinnerComponent } from '../spinner/spinner.component';
 import { ErrorComponent } from '../error/error.component';
 import { ToastService } from '../toast/toast.service';
-import { toObservable } from '@angular/core/rxjs-interop';
+import { rxResource, toObservable, toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-dish-list',
@@ -17,35 +17,27 @@ import { toObservable } from '@angular/core/rxjs-interop';
 export class DishListPage {
   title = signal('Plats du monde');
   filter = signal('');
-  dishes = signal<Dish[]>([]);
+  dishes: ResourceRef<Dish[]>;
   status = signal<'idle' | 'loading' | 'resolved' | 'error'>('idle');
   error = signal('');
   subtitle = computed(() => {
-    return `${this.dishes().length} plats internationaux`;
+    return `${this.dishes.value().length} plats internationaux`;
   });
   dishService = inject(DishService);
   toast = inject(ToastService);
 
-  getDishes() {
-    this.status.set('loading');
-
-    return this.dishService.getDishes(this.filter()).pipe(
-      tap(() => {
-        this.status.set('resolved');
-      }),
-      catchError(() => {
-        this.status.set('error');
-        this.error.set('Une erreur est survenue.');
-        return of([] as Dish[]);
-      }),
-    );
-  }
-
   constructor() {
     const filter$ = toObservable(this.filter).pipe(debounceTime(1000), distinctUntilChanged());
-    const dishes$ = filter$.pipe(switchMap(() => this.getDishes()));
-    dishes$.subscribe((dishes) => {
-      this.dishes.set(dishes);
+    const $filter = toSignal(filter$, { initialValue: '' });
+
+    this.dishes = rxResource({
+      request: () => ({
+        filter: $filter(),
+      }),
+      loader: ({ request }) => {
+        return this.dishService.getDishes(request.filter);
+      },
+      defaultValue: [],
     });
 
     effect(() => {
@@ -57,8 +49,7 @@ export class DishListPage {
   }
 
   deleteDish(dishId: string) {
-    this.dishes.update((dishes) => dishes.filter((dish) => dish.id !== dishId));
-    this.dishService.deleteDish(dishId).subscribe();
+    this.dishService.deleteDish(dishId).subscribe(() => this.dishes.reload());
   }
 
   likeDish(dishId: string) {
