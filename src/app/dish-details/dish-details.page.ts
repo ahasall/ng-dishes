@@ -1,4 +1,4 @@
-import { Component, inject, input } from '@angular/core';
+import { Component, effect, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DishService } from '../dish.service';
 import { httpResource } from '@angular/common/http';
@@ -24,5 +24,19 @@ export class DishDetailsPage {
   });
   $discount = httpResource(() => `/api/discounts/${this.dishId()}`, {
     parse: (value) => z.array(DiscountSchema).parse(value)[0],
+  });
+  blob = httpResource.blob(() => this.$dish.value()?.image);
+
+  _ = effect(() => {
+    if (this.blob.hasValue()) {
+      const b = this.blob.value();
+      const fileURL = URL.createObjectURL(b);
+
+      const downloadLink = document.createElement('a');
+      downloadLink.href = fileURL;
+      downloadLink.download = 'image.png';
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+    }
   });
 }
