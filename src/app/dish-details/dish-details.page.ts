@@ -1,19 +1,28 @@
-import { Component, inject } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, inject, input } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { DishService } from '../dish.service';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { httpResource } from '@angular/common/http';
+import { DishSchema } from '../dish';
+import { z } from 'zod';
+import { DiscountSchema } from '../discount';
+import { ErrorComponent } from '../error/error.component';
+import { SpinnerComponent } from '../spinner/spinner.component';
 
 @Component({
   selector: 'app-dish-details',
   templateUrl: './dish-details.page.html',
-  imports: [],
+  imports: [RouterLink, ErrorComponent, SpinnerComponent],
   host: {
     class: 'wma-mini-container',
   },
 })
 export class DishDetailsPage {
-  dishId = inject(ActivatedRoute).snapshot.paramMap.get('dishId')!;
+  dishId = input.required<string>();
   service = inject(DishService);
-  $dish = toSignal(this.service.getDish(this.dishId));
-  $discount = toSignal(this.service.getDishDiscount(this.dishId));
+  $dish = httpResource(() => `/api/dishes/${this.dishId()}`, {
+    parse: DishSchema.parse,
+  });
+  $discount = httpResource(() => `/api/discounts?dishId=${this.dishId()}`, {
+    parse: (value) => z.array(DiscountSchema).parse(value)[0],
+  });
 }
