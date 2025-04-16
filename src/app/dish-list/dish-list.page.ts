@@ -1,19 +1,20 @@
-import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { DishCardComponent } from '../dish-card/dish-card.component';
-import { catchError, of, tap } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, of, switchMap, tap } from 'rxjs';
 import { Dish } from '../dish';
 import { DishService } from '../dish.service';
 import { FormsModule } from '@angular/forms';
 import { SpinnerComponent } from '../spinner/spinner.component';
 import { ErrorComponent } from '../error/error.component';
 import { ToastService } from '../toast/toast.service';
+import { toObservable } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-dish-list',
   imports: [DishCardComponent, FormsModule, SpinnerComponent, ErrorComponent],
   templateUrl: './dish-list.page.html',
 })
-export class DishListPage implements OnInit {
+export class DishListPage {
   title = signal('Plats du monde');
   filter = signal('');
   dishes = signal<Dish[]>([]);
@@ -24,12 +25,6 @@ export class DishListPage implements OnInit {
   });
   dishService = inject(DishService);
   toast = inject(ToastService);
-
-  search() {
-    this.getDishes().subscribe((dishes) => {
-      this.dishes.set(dishes);
-    });
-  }
 
   getDishes() {
     this.status.set('loading');
@@ -47,6 +42,12 @@ export class DishListPage implements OnInit {
   }
 
   constructor() {
+    const filter$ = toObservable(this.filter).pipe(debounceTime(1000), distinctUntilChanged());
+    const dishes$ = filter$.pipe(switchMap(() => this.getDishes()));
+    dishes$.subscribe((dishes) => {
+      this.dishes.set(dishes);
+    });
+
     effect(() => {
       const error = this.error();
       if (error) {
@@ -55,19 +56,9 @@ export class DishListPage implements OnInit {
     });
   }
 
-  ngOnInit(): void {
-    this.search();
-  }
-
   deleteDish(dishId: string) {
-    this.dishService
-      .deleteDish(dishId)
-      .pipe(
-        tap(() => {
-          this.search();
-        }),
-      )
-      .subscribe();
+    this.dishes.update((dishes) => dishes.filter((dish) => dish.id !== dishId));
+    this.dishService.deleteDish(dishId).subscribe();
   }
 
   likeDish(dishId: string) {
