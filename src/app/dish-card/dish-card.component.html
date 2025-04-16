@@ -1,3 +1,5 @@
+@let dish = $dish();
+
 <img [src]="dish.image" [alt]="dish.name" class="h-48 w-full object-cover" />
 
 <app-dish-delete (delete)="deleteDish(dish.id)" class="absolute top-2 left-2" />
