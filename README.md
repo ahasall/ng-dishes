@@ -1,59 +1,103 @@
-# NgDishes
+# Les signaux dans Angular
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.7.
+La version 19 d'Angular marque une nouvelle ère pour le framework avec la stabilisation des API basées sur les signaux et des améliorations significatives de l'expérience développeur (DX).
+Tout cela pour permettre de créer des applications encore plus performantes.
 
-## Development server
+Input signals, output functions, Signal Queries, computed signals, linkedSignal, resources... Ce sont des termes dont vous avez probablement entendu parler récemment, mais que vous n'avez peut-être pas encore eu l'occasion d'explorer à travers des exemples concrets ou un projet pratique.
 
-To start a local development server, run:
+Ce workshop interactif est l'occasion idéale ! Nous construirons ensemble une application complète à partir de zéro, en mettant en pratique toutes ces notions clés.
+Si vous avez manqué les évolutions d'Angular depuis la version 16, ce sera également l'opportunité parfaite pour vous remettre à jour.
 
-```bash
-ng serve
-```
+À l'issue de ce workshop, les participants disposeront des connaissances essentielles pour développer une application complète et moderne en tirant parti des fonctionnalités de la dernière version d'Angular.
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+# Démarrer le projet
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Récupérer le code source
 
 ```bash
-ng generate component component-name
+git clone https://github.com/ahasall/ng-dishes
+cd ng-dishes
+npm install
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Démarrer le frontend
 
 ```bash
-ng generate --help
+ng serve --open
 ```
 
-## Building
-
-To build the project run:
+## Démarrer le backend
 
 ```bash
-ng build
+npm run start:server
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+# Exercices
 
-## Running unit tests
+## 1. Premier pas avec les signaux
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+### But
 
-```bash
-ng test
-```
+Découvrir les primitives `signal`, `computed` et `effect`.
 
-## Running end-to-end tests
+### Tâches
 
-For end-to-end (e2e) testing, run:
+Nous allons principalement travailler sur le composant `DishListPage`.
 
-```bash
-ng e2e
-```
+1. Convertir toutes les propriétés de la classe `DishListPage` en `signal`.
+2. Utiliser `computed` pour créer des signaux dérivés.
+3. Utiliser `effect` pour observer des signaux et déclencher des side effects comme ouvrir une notification en cas d'erreur (voir `ToastService`) ou loguer la valeur de `dishes`.
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## 2. Communication entre composants
 
-## Additional Resources
+### But
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Utiliser `input`, `output` et `model`.
+
+### Tâches
+
+Nous allons principalement travailler sur les composants `DishCardComponent`, `FavoriteComponent` et `DishDeleteComponent`.
+
+1. Convertir tous les `@Input` en `input`.
+2. Convertir tous les `@Output` en `output`.
+
+## 3. Interopérabilité avec RxJS
+
+### But
+
+Comprendre comment naviguer entre le monde des signaux et celui des observables.
+
+### Tâches
+
+1. Remplacer le pipe `async` par `toSignal` dans `DishDetailsPage`.
+2. Implémenter un typeahead pour le filtre dans `DishListPage` en utilisant `toObservable`.
+
+## 4. Les signaux et le monde asynchrone
+
+### But
+
+Comprendre comment intégrer du code asynchrone dans le monde des signaux.
+
+### Tâches
+
+1. Utiliser `rxResource` dans `DishListPage`.
+
+## 5. Les signaux et les requêtes HTTP
+
+### But
+
+Comprendre comment les signaux s'intègrent avec le client HTTP d'Angular.
+
+### Tâches
+
+1. Utiliser `httpResource` dans `DishDetailsPage`.
+
+## 6. Exercice final
+
+### But
+
+Consolider nos connaissances sur les signaux.
+
+### Tâches
+
+1. Utiliser tout ce qu'on a appris pour implémenter `DishDiscountCalculatorPage`.
