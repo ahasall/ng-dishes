@@ -1,16 +1,21 @@
-<img [src]="dish.image" [alt]="dish.name" class="h-48 w-full object-cover" />
+@let dishTmp = dish(); <!-- valable à partir de v18, variable pour affecter le get du signal pour eviter de les pultiplier -->
+<img [src]="dish().image" [alt]="dishTmp.name" class="h-48 w-full object-cover" />
 
-<app-dish-delete (delete)="deleteDish(dish.id)" class="absolute top-2 left-2" />
+<app-dish-delete (delete)="deleteDish(dishTmp.id)" class="absolute top-2 left-2" />
 
-<app-dish-favorite
-  [favorite]="dish.liked"
+<!-- <app-dish-favorite
+  [favorite]="dishTmp.liked"
   (favoriteChange)="onFavoriteChange($event)"
+  class="absolute top-2 right-2"
+/> -->
+<app-dish-favorite
+  [(favorite)]="dishTmp.liked"
   class="absolute top-2 right-2"
 />
 
 <div class="p-4">
-  <h2 class="text-xl font-semibold text-gray-800">{{ dish.name }}</h2>
-  <p class="mt-2 text-gray-600">{{ dish.country }}</p>
-  <p class="text-sm text-gray-500">{{ dish.continent }}</p>
-  <p class="mt-2 text-lg font-semibold text-green-600">{{ dish.price }}€</p>
+  <h2 class="text-xl font-semibold text-gray-800">{{ dishTmp.name }}</h2>
+  <p class="mt-2 text-gray-600">{{ dishTmp.country }}</p>
+  <p class="text-sm text-gray-500">{{ dishTmp.continent }}</p>
+  <p class="mt-2 text-lg font-semibold text-green-600">{{ dishTmp.price }}€</p>
 </div>
