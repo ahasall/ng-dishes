@@ -1,15 +1,17 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, Component, EventEmitter, input, Input, model, output, Output } from '@angular/core';
 
 @Component({
   selector: 'app-dish-favorite',
   templateUrl: './dish-favorite.component.html',
 })
 export class DishFavoriteComponent {
-  @Input() favorite = false;
-  @Output() favoriteChange = new EventEmitter<boolean>();
+  // favorite = input(false, {transform: booleanAttribute});
+  // favoriteChange = output<boolean>();
+  favorite = model(false)
 
   toggle() {
-    this.favorite = !this.favorite;
-    this.favoriteChange.emit(this.favorite);
+    this.favorite.set(!this.favorite());
+    // alternative : this.favorite.update((curr) => !curr);
+    // this.favoriteChange.emit(this.favorite()); -- pas besoin avec le = model
   }
 }
