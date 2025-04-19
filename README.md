@@ -10,6 +10,9 @@ Si vous avez manqué les évolutions d'Angular depuis la version 16, ce sera ég
 
 À l'issue de ce workshop, les participants disposeront des connaissances essentielles pour développer une application complète et moderne en tirant parti des fonctionnalités de la dernière version d'Angular.
 
+# Slides du workshop
+[Angular 19 - L'ère des applications complètes basées sur les signaux.pdf](Angular_19-L'ère_des_applications_complètes_basées_sur_les_signaux.pdf)
+
 # Démarrer le projet
 
 ## Récupérer le code source
