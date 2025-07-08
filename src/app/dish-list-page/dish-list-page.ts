@@ -3,11 +3,19 @@ import {
   computed,
   effect,
   inject,
-  OnInit,
+  linkedSignal,
   signal,
+  WritableSignal,
 } from '@angular/core';
 import { DishCard } from '../dish-card/dish-card';
-import { catchError, of, tap } from 'rxjs';
+import {
+  catchError,
+  debounceTime,
+  distinctUntilChanged,
+  of,
+  switchMap,
+  tap,
+} from 'rxjs';
 import { Dish } from '../dish';
 import { DishService } from '../dish-service';
 import { FormsModule } from '@angular/forms';
@@ -15,35 +23,38 @@ import { SpinnerComponent } from '../spinner/spinner.component';
 import { ErrorComponent } from '../error/error.component';
 import { LoaderStatus } from '../loader-status';
 import { ToastService } from '../toast/toast.service';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-dish-list-page',
   imports: [DishCard, FormsModule, SpinnerComponent, ErrorComponent],
   templateUrl: './dish-list-page.html',
 })
-export class DishListPage implements OnInit {
+export class DishListPage {
   title = 'Plats du monde';
   filter = signal('');
-  dishes = signal<Dish[]>([]);
   status = signal<LoaderStatus>('idle');
   error = signal('');
-  subtitle = computed(() => `${this.dishes().length} plats internationaux`);
+  subtitle = computed(() => `${this.$dishes().length} plats internationaux`);
 
   dishService = inject(DishService);
   toast = inject(ToastService);
+  $dishes: WritableSignal<Dish[]>;
 
   constructor() {
+    const filter$ = toObservable(this.filter).pipe(
+      debounceTime(1000),
+      distinctUntilChanged(),
+    );
+    const dishes$ = filter$.pipe(switchMap(() => this.getDishes()));
+
+    this.$dishes = linkedSignal(toSignal(dishes$, { initialValue: [] }));
+
     effect(() => {
       const error = this.error();
       if (error) {
         this.toast.error(error);
       }
-    });
-  }
-
-  search() {
-    this.getDishes().subscribe((dishes) => {
-      this.dishes.set(dishes);
     });
   }
 
@@ -62,19 +73,11 @@ export class DishListPage implements OnInit {
     );
   }
 
-  ngOnInit(): void {
-    this.search();
-  }
-
   deleteDish(dishId: string) {
-    this.dishService
-      .deleteDish(dishId)
-      .pipe(
-        tap(() => {
-          this.search();
-        }),
-      )
-      .subscribe();
+    this.$dishes.update((dishes) =>
+      dishes.filter((dish) => dish.id !== dishId),
+    );
+    this.dishService.deleteDish(dishId).subscribe();
   }
 
   likeDish(dishId: string) {
