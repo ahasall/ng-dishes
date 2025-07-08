@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { Dish } from '../dish';
 import { DishFavoriteButton } from '../dish-favorite-button/dish-favorite-button';
 import { DishDeleteButton } from '../dish-delete-button/dish-delete-button';
@@ -12,10 +12,12 @@ import { DishDeleteButton } from '../dish-delete-button/dish-delete-button';
   },
 })
 export class DishCard {
-  @Input({ required: true }) dish!: Dish;
-  @Output() delete = new EventEmitter<string>();
-  @Output() like = new EventEmitter();
-  @Output() unlike = new EventEmitter();
+  $dish = input.required<Dish>({
+    alias: 'dish'
+  });
+  delete = output<string>();
+  like = output();
+  unlike = output();
 
   deleteDish(dishId: string) {
     this.delete.emit(dishId);

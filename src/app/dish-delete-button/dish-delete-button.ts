@@ -1,11 +1,11 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, output } from '@angular/core';
 
 @Component({
   selector: 'app-dish-delete-button',
   templateUrl: './dish-delete-button.html',
 })
 export class DishDeleteButton {
-  @Output() delete = new EventEmitter<void>();
+  delete = output();
 
   deleteDish() {
     this.delete.emit();
