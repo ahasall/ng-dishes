@@ -3,25 +3,17 @@ import {
   computed,
   effect,
   inject,
-  linkedSignal,
+  resource,
+  ResourceRef,
   signal,
-  WritableSignal,
 } from '@angular/core';
 import { DishCard } from '../dish-card/dish-card';
-import {
-  catchError,
-  debounceTime,
-  distinctUntilChanged,
-  of,
-  switchMap,
-  tap,
-} from 'rxjs';
+import { debounceTime, distinctUntilChanged, firstValueFrom } from 'rxjs';
 import { Dish } from '../dish';
 import { DishService } from '../dish-service';
 import { FormsModule } from '@angular/forms';
 import { SpinnerComponent } from '../spinner/spinner.component';
 import { ErrorComponent } from '../error/error.component';
-import { LoaderStatus } from '../loader-status';
 import { ToastService } from '../toast/toast.service';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 
@@ -33,22 +25,32 @@ import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 export class DishListPage {
   title = 'Plats du monde';
   filter = signal('');
-  status = signal<LoaderStatus>('idle');
   error = signal('');
-  subtitle = computed(() => `${this.$dishes().length} plats internationaux`);
+  subtitle = computed(() => {
+    let count = (this.$dishes.hasValue() && this.$dishes.value().length) || 0;
+    return `${count} plats internationaux`;
+  });
 
   dishService = inject(DishService);
   toast = inject(ToastService);
-  $dishes: WritableSignal<Dish[]>;
+  $dishes: ResourceRef<Dish[]>;
 
   constructor() {
     const filter$ = toObservable(this.filter).pipe(
       debounceTime(1000),
       distinctUntilChanged(),
     );
-    const dishes$ = filter$.pipe(switchMap(() => this.getDishes()));
+    const $filter = toSignal(filter$, { initialValue: '' });
 
-    this.$dishes = linkedSignal(toSignal(dishes$, { initialValue: [] }));
+    this.$dishes = resource({
+      params: () => ({
+        filter: $filter(),
+      }),
+      loader: ({ params }) => {
+        return firstValueFrom(this.dishService.getDishes(params.filter));
+      },
+      defaultValue: [],
+    });
 
     effect(() => {
       const error = this.error();
@@ -56,21 +58,6 @@ export class DishListPage {
         this.toast.error(error);
       }
     });
-  }
-
-  getDishes() {
-    this.status.set('loading');
-
-    return this.dishService.getDishes(this.filter()).pipe(
-      tap(() => {
-        this.status.set('resolved');
-      }),
-      catchError(() => {
-        this.status.set('error');
-        this.error.set('Une erreur est survenue.');
-        return of([] as Dish[]);
-      }),
-    );
   }
 
   deleteDish(dishId: string) {
