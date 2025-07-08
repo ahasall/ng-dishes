@@ -1,4 +1,11 @@
-import { Component, inject, OnInit } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { DishCard } from '../dish-card/dish-card';
 import { catchError, of, tap } from 'rxjs';
 import { Dish } from '../dish';
@@ -7,6 +14,7 @@ import { FormsModule } from '@angular/forms';
 import { SpinnerComponent } from '../spinner/spinner.component';
 import { ErrorComponent } from '../error/error.component';
 import { LoaderStatus } from '../loader-status';
+import { ToastService } from '../toast/toast.service';
 
 @Component({
   selector: 'app-dish-list-page',
@@ -15,32 +23,40 @@ import { LoaderStatus } from '../loader-status';
 })
 export class DishListPage implements OnInit {
   title = 'Plats du monde';
-  filter = '';
-  dishes: Dish[] = [];
-  status: LoaderStatus = 'idle';
-  error = '';
-  get subtitle() {
-    return `${this.dishes.length} plats internationaux`;
-  }
+  filter = signal('');
+  dishes = signal<Dish[]>([]);
+  status = signal<LoaderStatus>('idle');
+  error = signal('');
+  subtitle = computed(() => `${this.dishes().length} plats internationaux`);
 
   dishService = inject(DishService);
+  toast = inject(ToastService);
+
+  constructor() {
+    effect(() => {
+      const error = this.error();
+      if (error) {
+        this.toast.error(error);
+      }
+    });
+  }
 
   search() {
     this.getDishes().subscribe((dishes) => {
-      this.dishes = dishes;
+      this.dishes.set(dishes);
     });
   }
 
   getDishes() {
-    this.status = 'loading';
+    this.status.set('loading');
 
-    return this.dishService.getDishes(this.filter).pipe(
+    return this.dishService.getDishes(this.filter()).pipe(
       tap(() => {
-        this.status = 'resolved';
+        this.status.set('resolved');
       }),
       catchError(() => {
-        this.status = 'error';
-        this.error = 'Une erreur est survenue.';
+        this.status.set('error');
+        this.error.set('Une erreur est survenue.');
         return of([] as Dish[]);
       }),
     );
