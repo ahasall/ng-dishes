@@ -1,0 +1,9 @@
+dist/
+coverage/
+node_modules/
+.idea
+.vscode/
+package.json
+package-lock.json
+.angular
+
